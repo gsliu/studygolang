@@ -7,6 +7,7 @@
 package main
 
 import (
+	"fmt"
 	"global"
 	"http/controller"
 	"http/controller/admin"
@@ -44,8 +45,12 @@ func main() {
 
 	logger.Init(ROOT+"/log", ConfigFile.MustValue("global", "log_level", "DEBUG"))
 
-	go ServeBackGround()
 
+	
+
+	//go ServeBackGround()
+
+	fmt.Println("before echo")
 	e := echo.New()
 
 	serveStatic(e)
@@ -67,7 +72,10 @@ func main() {
 	//std := standard.New(getAddr())
 	///e.SetHandler(e)
 
-	gracefulRun(e)
+	fmt.Println("before grace ful")
+	fmt.Println(getAddr())
+	//gracefulRun(e)
+	e.Start(getAddr())
 }
 
 func getAddr() string {

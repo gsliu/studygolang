@@ -34,12 +34,16 @@ func GetLogger(ctx echo.Context) *logger.Logger {
 	}
 
 	//_logger := ctx.Logger
-	_logger := ctx.Get("logger").(*logger.Logger)
-	if _logger != nil {
+	v := ctx.Get("logger")
+	//_logger := ctx.Get("logger").(*logger.Logger)
+	if v == nil {
+		_logger := logger.New(os.Stdout)
+		ctx.Set("logger", _logger)
 		return _logger
+	} else {
+		return v.(*logger.Logger)
 	}
 
-	return logger.New(os.Stdout)
 }
 
 // parseAtUser 解析 @某人
