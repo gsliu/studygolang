@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
+	//"github.com/labstack/echo/engine/standard"
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
 
@@ -25,7 +25,7 @@ type WebsocketController struct {
 }
 
 func (this *WebsocketController) RegisterRoute(g *echo.Group) {
-	g.GET("/ws", standard.WrapHandler(websocket.Handler(this.Ws)))
+	g.GET("/ws", echo.WrapHandler(websocket.Handler(this.Ws)))
 }
 
 // websocket，统计在线用户数

@@ -8,8 +8,8 @@ if [ ! -f install.sh ]; then
 fi
 
 CURDIR=`pwd`
-OLDGOPATH="$GOPATH"
-export GOPATH="$CURDIR"
+#OLDGOPATH="$GOPATH"
+#export GOPATH="$CURDIR"
 
 if [ ! -d log ]; then
 	mkdir log
@@ -21,8 +21,8 @@ go install -ldflags "-X global.Build="$BUILD server/studygolang
 go install server/indexer
 go install server/crawler
 
-export GOPATH="$OLDGOPATH"
-export PATH="$OLDPATH"
+#export GOPATH="$OLDGOPATH"
+#export PATH="$OLDPATH"
 
 echo 'finished'
 

@@ -19,7 +19,7 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
+	//"github.com/labstack/echo/engine/standard"
 	"github.com/polaris1119/config"
 )
 
@@ -49,7 +49,7 @@ func GetCookieSession(ctx echo.Context) *sessions.Session {
 }
 
 func Request(ctx echo.Context) *http.Request {
-	return ctx.Request().(*standard.Request).Request
+	return ctx.Request().(*echo.Request).Request
 }
 
 func ResponseWriter(ctx echo.Context) http.ResponseWriter {

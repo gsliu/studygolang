@@ -23,7 +23,7 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
+//	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
 	"github.com/polaris1119/logger"
 	thirdmw "github.com/polaris1119/middleware"
@@ -63,7 +63,8 @@ func main() {
 	adminG := e.Group("/admin", pwm.NeedLogin(), pwm.AdminAuth())
 	admin.RegisterRoutes(adminG)
 
-	std := standard.New(getAddr())
+	std := echo.New(getAddr())
+	//std := standard.New(getAddr())
 	std.SetHandler(e)
 
 	gracefulRun(std)
