@@ -15,7 +15,8 @@ import (
 	. "db"
 
 	"github.com/polaris1119/logger"
-	"golang.org/x/net/context"
+	"github.com/labstack/echo"
+	//"golang.org/x/net/context"
 )
 
 type AuthorityLogic struct{}
@@ -23,7 +24,8 @@ type AuthorityLogic struct{}
 var DefaultAuthority = AuthorityLogic{}
 
 // GetUserMenu 获取用户菜单
-func (self AuthorityLogic) GetUserMenu(ctx context.Context, user *model.Me, uri string) ([]*model.Authority, map[int][]*model.Authority, int) {
+func (self AuthorityLogic) GetUserMenu(ctx echo.Context, user *model.Me, uri string) ([]*model.Authority, map[int][]*model.Authority, int) {
+//func (self AuthorityLogic) GetUserMenu(ctx context.Context, user *model.Me, uri string) ([]*model.Authority, map[int][]*model.Authority, int) {
 	var (
 		aidMap = make(map[int]bool)
 		err    error
@@ -123,7 +125,7 @@ func (self AuthorityLogic) HasAuthority(user *model.Me, route string) bool {
 	return false
 }
 
-func (AuthorityLogic) FindAuthoritiesByPage(ctx context.Context, conds map[string]string, curPage, limit int) ([]*model.Authority, int) {
+func (AuthorityLogic) FindAuthoritiesByPage(ctx echo.Context, conds map[string]string, curPage, limit int) ([]*model.Authority, int) {
 	objLog := GetLogger(ctx)
 
 	session := MasterDB.NewSession()
@@ -152,7 +154,7 @@ func (AuthorityLogic) FindAuthoritiesByPage(ctx context.Context, conds map[strin
 	return auhtorities, int(total)
 }
 
-func (AuthorityLogic) FindById(ctx context.Context, aid int) *model.Authority {
+func (AuthorityLogic) FindById(ctx echo.Context, aid int) *model.Authority {
 	objLog := GetLogger(ctx)
 
 	if aid == 0 {
@@ -169,7 +171,7 @@ func (AuthorityLogic) FindById(ctx context.Context, aid int) *model.Authority {
 	return authority
 }
 
-func (AuthorityLogic) Save(ctx context.Context, form url.Values, opUser string) (errMsg string, err error) {
+func (AuthorityLogic) Save(ctx echo.Context, form url.Values, opUser string) (errMsg string, err error) {
 	objLog := GetLogger(ctx)
 
 	authority := &model.Authority{}

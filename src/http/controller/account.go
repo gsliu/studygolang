@@ -32,15 +32,15 @@ type AccountController struct{}
 // 注册路由
 func (self AccountController) RegisterRoute(g *echo.Group) {
 	g.Any("/account/register", self.Register)
-	g.Post("/account/send_activate_email", self.SendActivateEmail)
-	g.Get("/account/activate", self.Activate)
+	g.POST("/account/send_activate_email", self.SendActivateEmail)
+	g.GET("/account/activate", self.Activate)
 	g.Any("/account/login", self.Login)
 	g.Any("/account/edit", self.Edit, middleware.NeedLogin())
-	g.Post("/account/change_avatar", self.ChangeAvatar, middleware.NeedLogin())
-	g.Post("/account/changepwd", self.ChangePwd, middleware.NeedLogin())
+	g.POST("/account/change_avatar", self.ChangeAvatar, middleware.NeedLogin())
+	g.POST("/account/changepwd", self.ChangePwd, middleware.NeedLogin())
 	g.Any("/account/forgetpwd", self.ForgetPasswd)
 	g.Any("/account/resetpwd", self.ResetPasswd)
-	g.Get("/account/logout", self.Logout, middleware.NeedLogin())
+	g.GET("/account/logout", self.Logout, middleware.NeedLogin())
 }
 
 // 保存uuid和email的对应关系（TODO:重启如何处理，有效期问题）
@@ -54,7 +54,7 @@ func (self AccountController) Register(ctx echo.Context) error {
 	registerTpl := "register.html"
 	username := ctx.FormValue("username")
 	// 请求注册页面
-	if username == "" || ctx.Request().Method() != "POST" {
+	if username == "" || ctx.Request().Method != "POST" {
 		return render(ctx, registerTpl, map[string]interface{}{"captchaId": captcha.NewLen(4)})
 	}
 
@@ -208,7 +208,7 @@ func (AccountController) Login(ctx echo.Context) error {
 	data := make(map[string]interface{})
 
 	username := ctx.FormValue("username")
-	if username == "" || ctx.Request().Method() != "POST" {
+	if username == "" || ctx.Request().Method != "POST" {
 		data["redirect_uri"] = uri
 		return render(ctx, contentTpl, data)
 	}
@@ -241,7 +241,7 @@ func (AccountController) Login(ctx echo.Context) error {
 func (self AccountController) Edit(ctx echo.Context) error {
 	me := ctx.Get("user").(*model.Me)
 
-	if ctx.Request().Method() != "POST" {
+	if ctx.Request().Method != "POST" {
 		user := logic.DefaultUser.FindOne(ctx, "uid", me.Uid)
 		return render(ctx, "user/edit.html", map[string]interface{}{
 			"user":            user,
@@ -250,7 +250,9 @@ func (self AccountController) Edit(ctx echo.Context) error {
 	}
 
 	// 更新信息
-	errMsg, err := logic.DefaultUser.Update(ctx, me, ctx.Request().FormParams())
+	//para, _ := ctx.Request().FormParams()
+	para, _ := ctx.FormParams()
+	errMsg, err := logic.DefaultUser.Update(ctx, me, para)
 	if err != nil {
 		return fail(ctx, 1, errMsg)
 	}
@@ -307,7 +309,7 @@ func (AccountController) ForgetPasswd(ctx echo.Context) error {
 	data := map[string]interface{}{"activeUsers": "active"}
 
 	email := ctx.FormValue("email")
-	if email == "" || ctx.Request().Method() != "POST" {
+	if email == "" || ctx.Request().Method != "POST" {
 		return render(ctx, contentTpl, data)
 	}
 
@@ -352,7 +354,7 @@ func (AccountController) ResetPasswd(ctx echo.Context) error {
 	contentTpl := "user/reset_pwd.html"
 	data := map[string]interface{}{"activeUsers": "active"}
 
-	method := ctx.Request().Method()
+	method := ctx.Request().Method
 
 	passwd := ctx.FormValue("passwd")
 	email, ok := resetPwdMap[uuid]

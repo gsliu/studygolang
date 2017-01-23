@@ -58,7 +58,7 @@ func (TopicController) topicList(ctx echo.Context, view, orderBy, querystring st
 
 	topics := logic.DefaultTopic.FindAll(ctx, paginator, orderBy, querystring, args...)
 	total := logic.DefaultTopic.Count(ctx, querystring, args...)
-	pageHtml := paginator.SetTotal(total).GetPageHtml(ctx.Request().URL().Path())
+	pageHtml := paginator.SetTotal(total).GetPageHtml(ctx.Request().URL.Path)
 
 	data := map[string]interface{}{
 		"topics":       topics,
@@ -79,7 +79,7 @@ func (TopicController) NodeTopics(ctx echo.Context) error {
 	querystring, nid := "nid=?", goutils.MustInt(ctx.Param("nid"))
 	topics := logic.DefaultTopic.FindAll(ctx, paginator, "topics.mtime DESC", querystring, nid)
 	total := logic.DefaultTopic.Count(ctx, querystring, nid)
-	pageHtml := paginator.SetTotal(total).GetPageHtml(ctx.Request().URL().Path())
+	pageHtml := paginator.SetTotal(total).GetPageHtml(ctx.Request().URL.Path)
 
 	// 当前节点信息
 	node := logic.GetNode(nid)
@@ -119,12 +119,13 @@ func (TopicController) Create(ctx echo.Context) error {
 
 	title := ctx.FormValue("title")
 	// 请求新建主题页面
-	if title == "" || ctx.Request().Method() != "POST" {
+	if title == "" || ctx.Request().Method != "POST" {
 		return render(ctx, "topics/new.html", map[string]interface{}{"nodes": nodes, "activeTopics": "active"})
 	}
 
 	me := ctx.Get("user").(*model.Me)
-	err := logic.DefaultTopic.Publish(ctx, me, ctx.FormParams())
+	para, _ := ctx.FormParams()
+	err := logic.DefaultTopic.Publish(ctx, me, para)
 	if err != nil {
 		return fail(ctx, 1, "内部服务错误")
 	}
@@ -141,7 +142,7 @@ func (TopicController) Modify(ctx echo.Context) error {
 
 	nodes := logic.GenNodes()
 
-	if ctx.Request().Method() != "POST" {
+	if ctx.Request().Method != "POST" {
 		topics := logic.DefaultTopic.FindByTids([]int{tid})
 		if len(topics) == 0 {
 			return ctx.Redirect(http.StatusSeeOther, "/topics")
@@ -151,7 +152,8 @@ func (TopicController) Modify(ctx echo.Context) error {
 	}
 
 	me := ctx.Get("user").(*model.Me)
-	err := logic.DefaultTopic.Publish(ctx, me, ctx.FormParams())
+	para, _ := ctx.FormParams()
+	err := logic.DefaultTopic.Publish(ctx, me, para)
 	if err != nil {
 		if err == logic.NotModifyAuthorityErr {
 			return fail(ctx, 1, "没有权限操作")

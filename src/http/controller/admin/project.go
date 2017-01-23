@@ -97,7 +97,8 @@ func (self ProjectController) Modify(ctx echo.Context) error {
 
 	if ctx.FormValue("submit") == "1" {
 		user := ctx.Get("user").(*model.Me)
-		errMsg, err := logic.DefaultArticle.Modify(ctx, user, ctx.FormParams())
+		para, _ := ctx.FormParams()
+		errMsg, err := logic.DefaultArticle.Modify(ctx, user, para)
 		if err != nil {
 			return fail(ctx, 1, errMsg)
 		}

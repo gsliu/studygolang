@@ -23,8 +23,8 @@ func PublishNotice() echo.MiddlewareFunc {
 
 			title := ctx.FormValue("title")
 			content := ctx.FormValue("content")
-			if ctx.Request().Method() == "POST" && (title != "" || content != "") {
-				requestURI := ctx.Request().URI()
+			if ctx.Request().Method == "POST" && (title != "" || content != "") {
+				requestURI := ctx.Request().RequestURI
 				go func() {
 					user := logic.DefaultUser.FindOne(ctx, "is_root", 1)
 					if user.Uid == 0 {

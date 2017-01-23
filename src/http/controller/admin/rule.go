@@ -74,7 +74,8 @@ func (RuleController) New(ctx echo.Context) error {
 	if ctx.FormValue("submit") == "1" {
 		user := ctx.Get("user").(*model.Me)
 
-		errMsg, err := logic.DefaultRule.Save(ctx, ctx.FormParams(), user.Username)
+		para, _ := ctx.FormParams()
+		errMsg, err := logic.DefaultRule.Save(ctx, para, user.Username)
 		if err != nil {
 			return fail(ctx, 1, errMsg)
 		}
@@ -91,7 +92,9 @@ func (self RuleController) Modify(ctx echo.Context) error {
 	if ctx.FormValue("submit") == "1" {
 		user := ctx.Get("user").(*model.Me)
 
-		errMsg, err := logic.DefaultRule.Save(ctx, ctx.FormParams(), user.Username)
+		para, _ := ctx.FormParams()
+		errMsg, err := logic.DefaultRule.Save(ctx, para, user.Username)
+		//errMsg, err := logic.DefaultRule.Save(ctx, ctx.FormParams(), user.Username)
 		if err != nil {
 			return fail(ctx, 1, errMsg)
 		}

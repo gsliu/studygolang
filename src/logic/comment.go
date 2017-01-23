@@ -17,11 +17,12 @@ import (
 	. "db"
 
 	"github.com/fatih/structs"
+	"github.com/labstack/echo"
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
 	"github.com/polaris1119/set"
 	"github.com/polaris1119/slices"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/context"
 )
 
 type CommentLogic struct{}
@@ -31,7 +32,7 @@ var DefaultComment = CommentLogic{}
 // FindObjComments 获得某个对象的所有评论
 // owner: 被评论对象属主
 // TODO:分页暂不做
-func (self CommentLogic) FindObjComments(ctx context.Context, objid, objtype int, owner, lastCommentUid int /*, page, pageNum int*/) (comments []map[string]interface{}, ownerUser, lastReplyUser *model.User) {
+func (self CommentLogic) FindObjComments(ctx echo.Context, objid, objtype int, owner, lastCommentUid int /*, page, pageNum int*/) (comments []map[string]interface{}, ownerUser, lastReplyUser *model.User) {
 	objLog := GetLogger(ctx)
 
 	commentList := make([]*model.Comment, 0)
@@ -64,7 +65,7 @@ func (self CommentLogic) FindObjComments(ctx context.Context, objid, objtype int
 
 // FindObjectComments 获得某个对象的所有评论（新版）
 // TODO:分页暂不做
-func (self CommentLogic) FindObjectComments(ctx context.Context, objid, objtype int) (commentList []*model.Comment, err error) {
+func (self CommentLogic) FindObjectComments(ctx echo.Context, objid, objtype int) (commentList []*model.Comment, err error) {
 	objLog := GetLogger(ctx)
 
 	commentList = make([]*model.Comment, 0)
@@ -101,7 +102,7 @@ func (CommentLogic) Total(objtypes ...int) int64 {
 // FindRecent 获得最近的评论
 // 如果 uid!=0，表示获取某人的评论；
 // 如果 objtype!=-1，表示获取某类型的评论；
-func (self CommentLogic) FindRecent(ctx context.Context, uid, objtype, limit int) []*model.Comment {
+func (self CommentLogic) FindRecent(ctx echo.Context, uid, objtype, limit int) []*model.Comment {
 	dbSession := MasterDB.OrderBy("cid DESC").Limit(limit)
 
 	if uid != 0 {
@@ -146,7 +147,7 @@ func (self CommentLogic) FindRecent(ctx context.Context, uid, objtype, limit int
 // Publish 发表评论（或回复）。
 // objid 注册的评论对象
 // uid 评论人
-func (self CommentLogic) Publish(ctx context.Context, uid, objid int, form url.Values) (*model.Comment, error) {
+func (self CommentLogic) Publish(ctx echo.Context, uid, objid int, form url.Values) (*model.Comment, error) {
 	objLog := GetLogger(ctx)
 
 	objtype := goutils.MustInt(form.Get("objtype"))
@@ -190,7 +191,7 @@ func (self CommentLogic) Publish(ctx context.Context, uid, objid int, form url.V
 	return comment, nil
 }
 
-func (CommentLogic) sendSystemMsg(ctx context.Context, uid, objid, objtype, cid int, form url.Values) {
+func (CommentLogic) sendSystemMsg(ctx echo.Context, uid, objid, objtype, cid int, form url.Values) {
 	// 给被评论对象所有者发系统消息 TODO: ext 考虑结构化
 	ext := map[string]interface{}{
 		"objid":   objid,
@@ -220,7 +221,7 @@ func (CommentLogic) sendSystemMsg(ctx context.Context, uid, objid, objtype, cid 
 }
 
 // Modify 修改评论信息
-func (CommentLogic) Modify(ctx context.Context, cid int, content string) (errMsg string, err error) {
+func (CommentLogic) Modify(ctx echo.Context, cid int, content string) (errMsg string, err error) {
 	objLog := GetLogger(ctx)
 
 	_, err = MasterDB.Table(new(model.Comment)).Id(cid).Update(map[string]interface{}{"content": content})
@@ -266,7 +267,7 @@ func (CommentLogic) findByIds(cids []int) map[int]*model.Comment {
 	return comments
 }
 
-func (CommentLogic) decodeCmtContent(ctx context.Context, comment *model.Comment) string {
+func (CommentLogic) decodeCmtContent(ctx echo.Context, comment *model.Comment) string {
 	// 安全过滤
 	content := template.HTMLEscapeString(comment.Content)
 	// @别人

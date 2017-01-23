@@ -14,7 +14,8 @@ import (
 
 	"github.com/gorilla/schema"
 	"github.com/polaris1119/logger"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/context"
+	"github.com/labstack/echo"
 )
 
 var schemaDecoder = schema.NewDecoder()
@@ -26,13 +27,15 @@ func init() {
 
 var NotModifyAuthorityErr = errors.New("没有修改权限")
 
-func GetLogger(ctx context.Context) *logger.Logger {
+func GetLogger(ctx echo.Context) *logger.Logger {
+//func GetLogger(ctx context.Context) *logger.Logger {
 	if ctx == nil {
 		return logger.New(os.Stdout)
 	}
 
-	_logger, ok := ctx.Value("logger").(*logger.Logger)
-	if ok {
+	//_logger := ctx.Logger
+	_logger := ctx.Get("logger").(*logger.Logger)
+	if _logger != nil {
 		return _logger
 	}
 
@@ -40,7 +43,8 @@ func GetLogger(ctx context.Context) *logger.Logger {
 }
 
 // parseAtUser 解析 @某人
-func parseAtUser(ctx context.Context, content string) string {
+func parseAtUser(ctx echo.Context, content string) string {
+//func parseAtUser(ctx context.Context, content string) string {
 	reg := regexp.MustCompile(`@([^\s@]{4,20})`)
 	return reg.ReplaceAllStringFunc(content, func(matched string) string {
 		username := matched[1:]

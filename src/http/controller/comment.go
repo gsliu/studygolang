@@ -21,9 +21,9 @@ import (
 type CommentController struct{}
 
 func (self CommentController) RegisterRoute(g *echo.Group) {
-	g.Get("/at/users", self.AtUsers)
-	g.Post("/comment/:objid", self.Create, middleware.NeedLogin(), middleware.Sensivite(), middleware.PublishNotice())
-	g.Get("/object/comments", self.CommentList)
+	g.GET("/at/users", self.AtUsers)
+	g.POST("/comment/:objid", self.Create, middleware.NeedLogin(), middleware.Sensivite(), middleware.PublishNotice())
+	g.GET("/object/comments", self.CommentList)
 }
 
 // AtUsers 评论或回复 @ 某人 suggest
@@ -39,7 +39,8 @@ func (CommentController) Create(ctx echo.Context) error {
 
 	// 入库
 	objid := goutils.MustInt(ctx.Param("objid"))
-	comment, err := logic.DefaultComment.Publish(ctx, user.Uid, objid, ctx.FormParams())
+	para, _ := ctx.FormParams()
+	comment, err := logic.DefaultComment.Publish(ctx, user.Uid, objid, para)
 	if err != nil {
 		return fail(ctx, 1, "服务器内部错误")
 	}

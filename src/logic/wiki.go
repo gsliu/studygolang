@@ -13,7 +13,8 @@ import (
 	. "db"
 	"model"
 
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
@@ -25,7 +26,7 @@ type WikiLogic struct{}
 var DefaultWiki = WikiLogic{}
 
 // Create 创建一个wiki页面
-func (WikiLogic) Create(ctx context.Context, me *model.Me, form url.Values) error {
+func (WikiLogic) Create(ctx echo.Context, me *model.Me, form url.Values) error {
 	objLog := GetLogger(ctx)
 
 	wiki := &model.Wiki{}
@@ -48,7 +49,7 @@ func (WikiLogic) Create(ctx context.Context, me *model.Me, form url.Values) erro
 }
 
 // FindBy 获取 wiki 列表（分页）
-func (WikiLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*model.Wiki {
+func (WikiLogic) FindBy(ctx echo.Context, limit int, lastIds ...int) []*model.Wiki {
 	objLog := GetLogger(ctx)
 
 	dbSession := MasterDB.OrderBy("id DESC")
@@ -77,7 +78,7 @@ func (WikiLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*model
 }
 
 // FindOne 某个wiki页面详细信息
-func (WikiLogic) FindOne(ctx context.Context, uri string) *model.Wiki {
+func (WikiLogic) FindOne(ctx echo.Context, uri string) *model.Wiki {
 	objLog := GetLogger(ctx)
 
 	wiki := &model.Wiki{}

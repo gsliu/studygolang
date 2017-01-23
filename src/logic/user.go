@@ -18,7 +18,7 @@ import (
 	"github.com/go-validator/validator"
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
-	"golang.org/x/net/context"
+	"github.com/labstack/echo"
 
 	. "db"
 )
@@ -40,7 +40,7 @@ type UserLogic struct{}
 var DefaultUser = UserLogic{}
 
 // CreateUser 创建用户
-func (self UserLogic) CreateUser(ctx context.Context, form url.Values) (errMsg string, err error) {
+func (self UserLogic) CreateUser(ctx echo.Context, form url.Values) (errMsg string, err error) {
 	objLog := GetLogger(ctx)
 
 	if self.UserExists(ctx, "email", form.Get("email")) {
@@ -152,7 +152,7 @@ func (self UserLogic) CreateUser(ctx context.Context, form url.Values) (errMsg s
 }
 
 // Update 更新用户信息
-func (self UserLogic) Update(ctx context.Context, me *model.Me, form url.Values) (errMsg string, err error) {
+func (self UserLogic) Update(ctx echo.Context, me *model.Me, form url.Values) (errMsg string, err error) {
 	objLog := GetLogger(ctx)
 
 	if form.Get("open") != "1" {
@@ -187,7 +187,7 @@ func (self UserLogic) Update(ctx context.Context, me *model.Me, form url.Values)
 }
 
 // UpdateUserStatus 更新用户状态
-func (UserLogic) UpdateUserStatus(ctx context.Context, uid, status int) {
+func (UserLogic) UpdateUserStatus(ctx echo.Context, uid, status int) {
 	objLog := GetLogger(ctx)
 
 	_, err := MasterDB.Table(new(model.User)).Id(uid).Update(map[string]interface{}{"status": status})
@@ -197,7 +197,7 @@ func (UserLogic) UpdateUserStatus(ctx context.Context, uid, status int) {
 }
 
 // ChangeAvatar 更换头像
-func (UserLogic) ChangeAvatar(ctx context.Context, uid int, avatar string) (err error) {
+func (UserLogic) ChangeAvatar(ctx echo.Context, uid int, avatar string) (err error) {
 	changeData := map[string]interface{}{"avatar": avatar}
 	_, err = MasterDB.Table(new(model.User)).Id(uid).Update(changeData)
 	if err == nil {
@@ -208,7 +208,7 @@ func (UserLogic) ChangeAvatar(ctx context.Context, uid int, avatar string) (err 
 }
 
 // UserExists 判断用户是否存在
-func (UserLogic) UserExists(ctx context.Context, field, val string) bool {
+func (UserLogic) UserExists(ctx echo.Context, field, val string) bool {
 	objLog := GetLogger(ctx)
 
 	userLogin := &model.UserLogin{}
@@ -223,7 +223,7 @@ func (UserLogic) UserExists(ctx context.Context, field, val string) bool {
 }
 
 // EmailOrUsernameExists 判断指定的邮箱（email）或用户名是否存在
-func (UserLogic) EmailOrUsernameExists(ctx context.Context, email, username string) bool {
+func (UserLogic) EmailOrUsernameExists(ctx echo.Context, email, username string) bool {
 	objLog := GetLogger(ctx)
 
 	userLogin := &model.UserLogin{}
@@ -237,7 +237,7 @@ func (UserLogic) EmailOrUsernameExists(ctx context.Context, email, username stri
 	return true
 }
 
-func (self UserLogic) FindUserInfos(ctx context.Context, uids []int) map[int]*model.User {
+func (self UserLogic) FindUserInfos(ctx echo.Context, uids []int) map[int]*model.User {
 	objLog := GetLogger(ctx)
 	if len(uids) == 0 {
 		return nil
@@ -251,7 +251,7 @@ func (self UserLogic) FindUserInfos(ctx context.Context, uids []int) map[int]*mo
 	return usersMap
 }
 
-func (self UserLogic) FindOne(ctx context.Context, field string, val interface{}) *model.User {
+func (self UserLogic) FindOne(ctx echo.Context, field string, val interface{}) *model.User {
 	objLog := GetLogger(ctx)
 
 	user := &model.User{}
@@ -289,7 +289,7 @@ func (self UserLogic) FindOne(ctx context.Context, field string, val interface{}
 }
 
 // 获取当前登录用户信息（常用信息）
-func (self UserLogic) FindCurrentUser(ctx context.Context, username interface{}) *model.Me {
+func (self UserLogic) FindCurrentUser(ctx echo.Context, username interface{}) *model.Me {
 	objLog := GetLogger(ctx)
 
 	user := &model.User{}
@@ -354,7 +354,7 @@ var (
 )
 
 // Login 登录；成功返回用户登录信息(user_login)
-func (self UserLogic) Login(ctx context.Context, username, passwd string) (*model.UserLogin, error) {
+func (self UserLogic) Login(ctx echo.Context, username, passwd string) (*model.UserLogin, error) {
 	objLog := GetLogger(ctx)
 
 	userLogin := &model.UserLogin{}
@@ -398,7 +398,7 @@ func (self UserLogic) Login(ctx context.Context, username, passwd string) (*mode
 }
 
 // UpdatePasswd 更新用户密码
-func (self UserLogic) UpdatePasswd(ctx context.Context, username, curPasswd, newPasswd string) (string, error) {
+func (self UserLogic) UpdatePasswd(ctx echo.Context, username, curPasswd, newPasswd string) (string, error) {
 	_, err := self.Login(ctx, username, curPasswd)
 	if err != nil {
 		return "原密码填写错误", err
@@ -424,7 +424,7 @@ func (self UserLogic) UpdatePasswd(ctx context.Context, username, curPasswd, new
 	return "", nil
 }
 
-func (self UserLogic) ResetPasswd(ctx context.Context, email, passwd string) (string, error) {
+func (self UserLogic) ResetPasswd(ctx echo.Context, email, passwd string) (string, error) {
 	objLog := GetLogger(ctx)
 
 	userLogin := &model.UserLogin{
@@ -448,7 +448,7 @@ func (self UserLogic) ResetPasswd(ctx context.Context, email, passwd string) (st
 }
 
 // Activate 用户激活
-func (self UserLogic) Activate(ctx context.Context, email, uuid string, timestamp int64, sign string) (*model.User, error) {
+func (self UserLogic) Activate(ctx echo.Context, email, uuid string, timestamp int64, sign string) (*model.User, error) {
 	objLog := GetLogger(ctx)
 
 	realSign := DefaultEmail.genActivateSign(email, uuid, timestamp)
@@ -505,7 +505,7 @@ func (UserLogic) RecordLoginTime(username string) error {
 }
 
 // FindActiveUsers 获得活跃用户
-func (UserLogic) FindActiveUsers(ctx context.Context, limit int, offset ...int) []*model.UserActive {
+func (UserLogic) FindActiveUsers(ctx echo.Context, limit int, offset ...int) []*model.UserActive {
 	objLog := GetLogger(ctx)
 
 	activeUsers := make([]*model.UserActive, 0)
@@ -518,7 +518,7 @@ func (UserLogic) FindActiveUsers(ctx context.Context, limit int, offset ...int) 
 }
 
 // FindNewUsers 最新加入会员
-func (UserLogic) FindNewUsers(ctx context.Context, limit int, offset ...int) []*model.User {
+func (UserLogic) FindNewUsers(ctx echo.Context, limit int, offset ...int) []*model.User {
 	objLog := GetLogger(ctx)
 
 	users := make([]*model.User, 0)
@@ -558,7 +558,7 @@ func (UserLogic) FindNotLoginUsers(loginTime time.Time) (userList []*model.UserL
 }
 
 // 邮件订阅或取消订阅
-func (UserLogic) EmailSubscribe(ctx context.Context, uid, unsubscribe int) {
+func (UserLogic) EmailSubscribe(ctx echo.Context, uid, unsubscribe int) {
 	_, err := MasterDB.Table(&model.User{}).Id(uid).Update(map[string]interface{}{"unsubscribe": unsubscribe})
 	if err != nil {
 		logger.Errorln("user:", uid, "Email Subscribe Error:", err)

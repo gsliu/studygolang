@@ -55,7 +55,7 @@ func NeedLogin() echo.MiddlewareFunc {
 		return func(ctx echo.Context) error {
 			user, ok := ctx.Get("user").(*model.Me)
 			if !ok || user.Status != model.UserStatusAudit {
-				method := ctx.Request().Method()
+				method := ctx.Request().Method
 				if util.IsAjax(ctx) {
 					return ctx.JSON(http.StatusForbidden, `{"ok":0,"error":"403 Forbidden"}`)
 				} else {
@@ -64,10 +64,10 @@ func NeedLogin() echo.MiddlewareFunc {
 					}
 
 					if !ok {
-						reqURL := ctx.Request().URL()
-						uri := reqURL.Path()
-						if reqURL.QueryString() != "" {
-							uri += "?" + reqURL.QueryString()
+						reqURL := ctx.Request().URL
+						uri := reqURL.Path
+						if reqURL.RawQuery != "" {
+							uri += "?" + reqURL.RawQuery
 						}
 						return ctx.Redirect(http.StatusSeeOther, "/account/login?redirect_uri="+url.QueryEscape(uri))
 					} else {

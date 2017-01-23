@@ -98,7 +98,8 @@ func (self ArticleController) Modify(ctx echo.Context) error {
 
 	if ctx.FormValue("submit") == "1" {
 		user := ctx.Get("user").(*model.Me)
-		errMsg, err := logic.DefaultArticle.Modify(ctx, user, ctx.FormParams())
+		paras, _ := ctx.FormParams()
+		errMsg, err := logic.DefaultArticle.Modify(ctx, user, paras)
 		if err != nil {
 			return fail(ctx, 1, errMsg)
 		}

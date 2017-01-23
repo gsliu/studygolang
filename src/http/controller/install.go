@@ -163,7 +163,7 @@ func (InstallController) SetupOptions(ctx echo.Context) error {
 		return ctx.Redirect(http.StatusSeeOther, "/")
 	}
 
-	if ctx.Request().Method() == "POST" {
+	if ctx.Request().Method == "POST" {
 		config.ConfigFile.SetSectionComments("email", "用于注册发送激活码等")
 		emailFields := []string{"smtp_host", "smtp_port", "smtp_username", "smtp_password", "from_email"}
 		for _, field := range emailFields {
@@ -180,7 +180,8 @@ func (InstallController) SetupOptions(ctx echo.Context) error {
 			config.ConfigFile.SetValue("qiniu", field, ctx.FormValue(field))
 		}
 
-		config.SaveConfigFile()
+		//config.ConfigFile.SaveConfigFile()
+		//config.SaveConfigFile()
 
 		return renderInstall(ctx, "install/setup-options.html", map[string]interface{}{"success": true})
 	}
@@ -263,7 +264,7 @@ func (InstallController) genConfig(ctx echo.Context) error {
 		return err
 	}
 
-	config.SaveConfigFile()
+	//config.SaveConfigFile()
 	return nil
 }
 
@@ -276,7 +277,7 @@ func renderInstall(ctx echo.Context, filename string, data map[string]interface{
 
 	filename = config.TemplateDir + filename
 
-	requestURI := ctx.Request().URI()
+	requestURI := ctx.Request().RequestURI
 	tpl, err := template.ParseFiles(filename)
 	if err != nil {
 		objLog.Errorf("解析模板出错（ParseFiles）：[%q] %s\n", requestURI, err)

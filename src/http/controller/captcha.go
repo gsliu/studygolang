@@ -19,7 +19,7 @@ var captchaHandler = captcha.Server(100, 40)
 type CaptchaController struct{}
 
 func (self CaptchaController) RegisterRoute(g *echo.Group) {
-	g.Get("/captcha/*", self.Server)
+	g.GET("/captcha/*", self.Server)
 }
 
 func (CaptchaController) Server(ctx echo.Context) error {

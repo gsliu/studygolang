@@ -20,7 +20,8 @@ import (
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
 	"github.com/polaris1119/set"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 )
 
 type TopicLogic struct{}
@@ -28,7 +29,7 @@ type TopicLogic struct{}
 var DefaultTopic = TopicLogic{}
 
 // Publish 发布主题。入topics和topics_ex库
-func (self TopicLogic) Publish(ctx context.Context, me *model.Me, form url.Values) (err error) {
+func (self TopicLogic) Publish(ctx echo.Context, me *model.Me, form url.Values) (err error) {
 	objLog := GetLogger(ctx)
 
 	tid := goutils.MustInt(form.Get("tid"))
@@ -102,7 +103,7 @@ func (self TopicLogic) Publish(ctx context.Context, me *model.Me, form url.Value
 
 // Modify 修改主题
 // user 修改人的（有可能是作者或管理员）
-func (TopicLogic) Modify(ctx context.Context, user *model.Me, form url.Values) (errMsg string, err error) {
+func (TopicLogic) Modify(ctx echo.Context, user *model.Me, form url.Values) (errMsg string, err error) {
 	objLog := GetLogger(ctx)
 
 	change := map[string]interface{}{
@@ -129,7 +130,7 @@ func (TopicLogic) Modify(ctx context.Context, user *model.Me, form url.Values) (
 }
 
 // FindAll 支持多页翻看
-func (TopicLogic) FindAll(ctx context.Context, paginator *Paginator, orderBy string, querystring string, args ...interface{}) []map[string]interface{} {
+func (TopicLogic) FindAll(ctx echo.Context, paginator *Paginator, orderBy string, querystring string, args ...interface{}) []map[string]interface{} {
 	objLog := GetLogger(ctx)
 
 	topicInfos := make([]*model.TopicInfo, 0)
@@ -208,7 +209,7 @@ func (TopicLogic) FindRecent(limit int, uids ...int) []*model.Topic {
 }
 
 // FindByNid 获得某个节点下的主题列表（侧边栏推荐）
-func (TopicLogic) FindByNid(ctx context.Context, nid, curTid string) []*model.Topic {
+func (TopicLogic) FindByNid(ctx echo.Context, nid, curTid string) []*model.Topic {
 	objLog := GetLogger(ctx)
 
 	topics := make([]*model.Topic, 0)
@@ -251,7 +252,7 @@ func (TopicLogic) findByTids(tids []int) map[int]*model.Topic {
 }
 
 // FindByTid 获得主题详细信息（包括详细回复）
-func (self TopicLogic) FindByTid(ctx context.Context, tid int) (topicMap map[string]interface{}, replies []map[string]interface{}, err error) {
+func (self TopicLogic) FindByTid(ctx echo.Context, tid int) (topicMap map[string]interface{}, replies []map[string]interface{}, err error) {
 	objLog := GetLogger(ctx)
 
 	topicInfo := &model.TopicInfo{}
@@ -296,7 +297,7 @@ func (self TopicLogic) FindByTid(ctx context.Context, tid int) (topicMap map[str
 }
 
 // FindHotNodes 获得热门节点
-func (TopicLogic) FindHotNodes(ctx context.Context) []map[string]interface{} {
+func (TopicLogic) FindHotNodes(ctx echo.Context) []map[string]interface{} {
 	objLog := GetLogger(ctx)
 
 	strSql := "SELECT nid, COUNT(1) AS topicnum FROM topics GROUP BY nid ORDER BY topicnum DESC LIMIT 10"
@@ -341,7 +342,7 @@ func (TopicLogic) JSEscape(topics []*model.Topic) []*model.Topic {
 	return topics
 }
 
-func (TopicLogic) Count(ctx context.Context, querystring string, args ...interface{}) int64 {
+func (TopicLogic) Count(ctx echo.Context, querystring string, args ...interface{}) int64 {
 	objLog := GetLogger(ctx)
 
 	var (
@@ -372,7 +373,7 @@ func (TopicLogic) getOwner(tid int) int {
 	return topic.Uid
 }
 
-func (TopicLogic) decodeTopicContent(ctx context.Context, topic *model.Topic) string {
+func (TopicLogic) decodeTopicContent(ctx echo.Context, topic *model.Topic) string {
 	// 安全过滤
 	content := template.HTMLEscapeString(topic.Content)
 

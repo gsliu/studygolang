@@ -6,7 +6,8 @@ import (
 	"model"
 
 	"github.com/polaris1119/config"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 
 	. "db"
 )
@@ -15,7 +16,7 @@ type InstallLogic struct{}
 
 var DefaultInstall = InstallLogic{}
 
-func (InstallLogic) CreateTable(ctx context.Context) error {
+func (InstallLogic) CreateTable(ctx echo.Context) error {
 	objLog := GetLogger(ctx)
 
 	dbFile := config.ROOT + "/config/db.sql"
@@ -46,7 +47,7 @@ func (InstallLogic) CreateTable(ctx context.Context) error {
 }
 
 // InitTable 初始化数据表
-func (InstallLogic) InitTable(ctx context.Context) error {
+func (InstallLogic) InitTable(ctx echo.Context) error {
 	objLog := GetLogger(ctx)
 
 	total, err := MasterDB.Count(new(model.Role))
@@ -83,7 +84,7 @@ func (InstallLogic) InitTable(ctx context.Context) error {
 	return err
 }
 
-func (InstallLogic) IsTableExist(ctx context.Context) bool {
+func (InstallLogic) IsTableExist(ctx echo.Context) bool {
 	exists, err := MasterDB.IsTableExist(new(model.User))
 	if err != nil || !exists {
 		return false
@@ -93,7 +94,7 @@ func (InstallLogic) IsTableExist(ctx context.Context) bool {
 }
 
 // HadRootUser 是否已经创建了超级用户
-func (InstallLogic) HadRootUser(ctx context.Context) bool {
+func (InstallLogic) HadRootUser(ctx echo.Context) bool {
 	user := &model.User{}
 	_, err := MasterDB.Where("is_root=?", 1).Get(user)
 	if err != nil {

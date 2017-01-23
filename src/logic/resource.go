@@ -17,7 +17,8 @@ import (
 	"github.com/fatih/structs"
 	"github.com/polaris1119/logger"
 	"github.com/polaris1119/set"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 )
 
 type ResourceLogic struct{}
@@ -25,7 +26,7 @@ type ResourceLogic struct{}
 var DefaultResource = ResourceLogic{}
 
 // Publish 增加（修改）资源
-func (ResourceLogic) Publish(ctx context.Context, me *model.Me, form url.Values) (err error) {
+func (ResourceLogic) Publish(ctx echo.Context, me *model.Me, form url.Values) (err error) {
 	objLog := GetLogger(ctx)
 
 	uid := me.Uid
@@ -135,7 +136,7 @@ func (ResourceLogic) Total() int64 {
 }
 
 // FindBy 获取资源列表（分页）
-func (ResourceLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*model.Resource {
+func (ResourceLogic) FindBy(ctx echo.Context, limit int, lastIds ...int) []*model.Resource {
 	objLog := GetLogger(ctx)
 
 	dbSession := MasterDB.OrderBy("id DESC").Limit(limit)
@@ -154,7 +155,7 @@ func (ResourceLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*m
 }
 
 // FindByCatid 获得某个分类的资源列表，分页
-func (ResourceLogic) FindByCatid(ctx context.Context, paginator *Paginator, catid int) (resources []map[string]interface{}, total int64) {
+func (ResourceLogic) FindByCatid(ctx echo.Context, paginator *Paginator, catid int) (resources []map[string]interface{}, total int64) {
 	objLog := GetLogger(ctx)
 
 	var (
@@ -237,7 +238,7 @@ func (ResourceLogic) findByIds(ids []int) map[int]*model.Resource {
 }
 
 // 获得资源详细信息
-func (ResourceLogic) FindById(ctx context.Context, id int) (resourceMap map[string]interface{}, comments []map[string]interface{}) {
+func (ResourceLogic) FindById(ctx echo.Context, id int) (resourceMap map[string]interface{}, comments []map[string]interface{}) {
 	objLog := GetLogger(ctx)
 
 	resourceInfo := &model.ResourceInfo{}
@@ -275,7 +276,7 @@ func (ResourceLogic) FindById(ctx context.Context, id int) (resourceMap map[stri
 }
 
 // 获取单个 Resource 信息（用于编辑）
-func (ResourceLogic) FindResource(ctx context.Context, id int) *model.Resource {
+func (ResourceLogic) FindResource(ctx echo.Context, id int) *model.Resource {
 	objLog := GetLogger(ctx)
 
 	resource := &model.Resource{}
@@ -288,7 +289,7 @@ func (ResourceLogic) FindResource(ctx context.Context, id int) *model.Resource {
 }
 
 // 获得某个用户最近的资源
-func (ResourceLogic) FindRecent(ctx context.Context, uid int) []*model.Resource {
+func (ResourceLogic) FindRecent(ctx echo.Context, uid int) []*model.Resource {
 	resourceList := make([]*model.Resource, 0)
 	err := MasterDB.Where("uid=?", uid).Limit(5).OrderBy("id DESC").Find(&resourceList)
 	if err != nil {

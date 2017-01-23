@@ -39,12 +39,13 @@ func (self WikiController) RegisterRoute(g *echo.Group) {
 func (WikiController) Create(ctx echo.Context) error {
 	title := ctx.FormValue("title")
 	// 请求新建 wiki 页面
-	if title == "" || ctx.Request().Method() != "POST" {
+	if title == "" || ctx.Request().Method != "POST" {
 		return render(ctx, "wiki/new.html", map[string]interface{}{"activeWiki": "active"})
 	}
 
 	me := ctx.Get("user").(*model.Me)
-	err := logic.DefaultWiki.Create(ctx, me, ctx.FormParams())
+	para, _ := ctx.FormParams()
+	err := logic.DefaultWiki.Create(ctx, me, para)
 	if err != nil {
 		return fail(ctx, 1, "内部服务错误")
 	}

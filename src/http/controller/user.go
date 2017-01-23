@@ -75,7 +75,7 @@ func (UserController) EmailUnsub(ctx echo.Context) error {
 		return ctx.Redirect(http.StatusSeeOther, "/")
 	}
 
-	if ctx.Request().Method() != "POST" {
+	if ctx.Request().Method != "POST" {
 		data := map[string]interface{}{
 			"email":       email,
 			"token":       token,

@@ -19,7 +19,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/polaris1119/logger"
 	"github.com/polaris1119/times"
-	"golang.org/x/net/context"
+	"github.com/labstack/echo"
+	//"golang.org/x/net/context"
 )
 
 type ArticleLogic struct{}
@@ -35,7 +36,8 @@ var articleRe = regexp.MustCompile("[\r　\n  \t\v]+")
 var articleSpaceRe = regexp.MustCompile("[ ]+")
 
 // ParseArticle 获取 url 对应的文章并根据规则进行解析
-func (ArticleLogic) ParseArticle(ctx context.Context, articleUrl string, auto bool) (*model.Article, error) {
+func (ArticleLogic) ParseArticle(ctx echo.Context, articleUrl string, auto bool) (*model.Article, error) {
+//func (ArticleLogic) ParseArticle(ctx context.Context, articleUrl string, auto bool) (*model.Article, error) {
 	articleUrl = strings.TrimSpace(articleUrl)
 	if !strings.HasPrefix(articleUrl, "http") {
 		articleUrl = "http://" + articleUrl
@@ -229,7 +231,8 @@ func (ArticleLogic) Total() int64 {
 }
 
 // FindBy 获取抓取的文章列表（分页）
-func (ArticleLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*model.Article {
+func (ArticleLogic) FindBy(ctx echo.Context, limit int, lastIds ...int) []*model.Article {
+//func (ArticleLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*model.Article {
 	objLog := GetLogger(ctx)
 
 	dbSession := MasterDB.Where("status IN(?,?)", model.ArticleStatusNew, model.ArticleStatusOnline)
@@ -259,7 +262,8 @@ func (ArticleLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*mo
 }
 
 // 获取抓取的文章列表（分页）：后台用
-func (ArticleLogic) FindArticleByPage(ctx context.Context, conds map[string]string, curPage, limit int) ([]*model.Article, int) {
+func (ArticleLogic) FindArticleByPage(ctx echo.Context, conds map[string]string, curPage, limit int) ([]*model.Article, int) {
+//func (ArticleLogic) FindArticleByPage(ctx context.Context, conds map[string]string, curPage, limit int) ([]*model.Article, int) {
 	objLog := GetLogger(ctx)
 
 	session := MasterDB.NewSession()
@@ -317,7 +321,8 @@ func (ArticleLogic) findByIds(ids []int) map[int]*model.Article {
 }
 
 // FindByIdAndPreNext 获取当前(id)博文以及前后博文
-func (ArticleLogic) FindByIdAndPreNext(ctx context.Context, id int) (curArticle *model.Article, prevNext []*model.Article, err error) {
+func (ArticleLogic) FindByIdAndPreNext(ctx echo.Context, id int) (curArticle *model.Article, prevNext []*model.Article, err error) {
+//func (ArticleLogic) FindByIdAndPreNext(ctx context.Context, id int) (curArticle *model.Article, prevNext []*model.Article, err error) {
 	objLog := GetLogger(ctx)
 
 	articles := make([]*model.Article, 0)
@@ -359,7 +364,7 @@ func (ArticleLogic) FindByIdAndPreNext(ctx context.Context, id int) (curArticle 
 }
 
 // Modify 修改文章信息
-func (ArticleLogic) Modify(ctx context.Context, user *model.Me, form url.Values) (errMsg string, err error) {
+func (ArticleLogic) Modify(ctx echo.Context, user *model.Me, form url.Values) (errMsg string, err error) {
 	form.Set("op_user", user.Username)
 
 	fields := []string{
@@ -385,7 +390,7 @@ func (ArticleLogic) Modify(ctx context.Context, user *model.Me, form url.Values)
 }
 
 // FindById 获取单条博文
-func (ArticleLogic) FindById(ctx context.Context, id string) (*model.Article, error) {
+func (ArticleLogic) FindById(ctx echo.Context, id string) (*model.Article, error) {
 	article := &model.Article{}
 	_, err := MasterDB.Id(id).Get(article)
 	if err != nil {

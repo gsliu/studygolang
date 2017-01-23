@@ -97,13 +97,14 @@ func (ProjectController) ReadList(ctx echo.Context) error {
 func (ProjectController) Create(ctx echo.Context) error {
 	name := ctx.FormValue("name")
 	// 请求新建项目页面
-	if name == "" || ctx.Request().Method() != "POST" {
+	if name == "" || ctx.Request().Method != "POST" {
 		project := &model.OpenProject{}
 		return render(ctx, "projects/new.html", map[string]interface{}{"project": project, "activeProjects": "active"})
 	}
 
 	user := ctx.Get("user").(*model.Me)
-	err := logic.DefaultProject.Publish(ctx, user, ctx.FormParams())
+	para, _ := ctx.FormParams()
+	err := logic.DefaultProject.Publish(ctx, user, para)
 	if err != nil {
 		return fail(ctx, 1, "内部服务错误！")
 	}
@@ -118,13 +119,14 @@ func (ProjectController) Modify(ctx echo.Context) error {
 	}
 
 	// 请求编辑项目页面
-	if ctx.Request().Method() != "POST" {
+	if ctx.Request().Method != "POST" {
 		project := logic.DefaultProject.FindOne(ctx, id)
 		return render(ctx, "projects/new.html", map[string]interface{}{"project": project, "activeProjects": "active"})
 	}
 
 	user := ctx.Get("user").(*model.Me)
-	err := logic.DefaultProject.Publish(ctx, user, ctx.FormParams())
+	para, _ := ctx.FormParams()
+	err := logic.DefaultProject.Publish(ctx, user, para)
 	if err != nil {
 		if err == logic.NotModifyAuthorityErr {
 			return ctx.String(http.StatusForbidden, "没有权限")

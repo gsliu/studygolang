@@ -23,7 +23,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/robfig/cron"
-	"golang.org/x/net/context"
+//	"golang.org/x/net/context"
 )
 
 var websites = make(map[string]map[string]string)
@@ -169,14 +169,17 @@ func parseArticleList(url, listselector, resultselector string, isAuto bool) (er
 			}
 		}
 
-		articleUrl, ok := aSelection.Attr("href")
+		//articleUrl, ok := aSelection.Attr("href")
+	/*	
+		_, ok := aSelection.Attr("href")
 		if ok {
 			pos := strings.LastIndex(articleUrl, "?")
 			if pos != -1 {
 				articleUrl = articleUrl[:pos]
 			}
-			logic.DefaultArticle.ParseArticle(context.Background(), articleUrl, isAuto)
+		//	logic.DefaultArticle.ParseArticle(context.Background(), articleUrl, isAuto)
 		}
+	*/
 	})
 
 	return

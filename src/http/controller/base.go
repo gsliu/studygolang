@@ -45,7 +45,7 @@ func success(ctx echo.Context, data interface{}) error {
 		}
 	}(b)
 
-	if ctx.Response().Committed() {
+	if ctx.Response().Committed {
 		getLogger(ctx).Flush()
 		return nil
 	}
@@ -54,7 +54,7 @@ func success(ctx echo.Context, data interface{}) error {
 }
 
 func fail(ctx echo.Context, code int, msg string) error {
-	if ctx.Response().Committed() {
+	if ctx.Response().Committed {
 		getLogger(ctx).Flush()
 		return nil
 	}

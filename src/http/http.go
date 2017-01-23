@@ -49,11 +49,13 @@ func GetCookieSession(ctx echo.Context) *sessions.Session {
 }
 
 func Request(ctx echo.Context) *http.Request {
-	return ctx.Request().(*echo.Request).Request
+	//return ctx.Request().(*echo.Request).Request
+	return ctx.Request()
 }
 
 func ResponseWriter(ctx echo.Context) http.ResponseWriter {
-	return ctx.Response().(*standard.Response).ResponseWriter
+	//return ctx.Response().(*standard.Response).ResponseWriter
+	return ctx.Response().Writer
 }
 
 // 自定义模板函数
@@ -148,12 +150,14 @@ func RenderAdmin(ctx echo.Context, contentTpl string, data map[string]interface{
 	// 当前用户信息
 	curUser := ctx.Get("user").(*model.Me)
 
+	
 	if menu1, menu2, curMenu1 := logic.DefaultAuthority.GetUserMenu(ctx, curUser, requestURI); menu2 != nil {
 		data["menu1"] = menu1
 		data["menu2"] = menu2
 		data["uri"] = requestURI
 		data["cur_menu1"] = curMenu1
 	}
+
 
 	return executeTpl(ctx, tpl, data)
 }

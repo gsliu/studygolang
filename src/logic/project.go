@@ -21,14 +21,15 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/lunny/html2md"
 	"github.com/polaris1119/logger"
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 )
 
 type ProjectLogic struct{}
 
 var DefaultProject = ProjectLogic{}
 
-func (self ProjectLogic) Publish(ctx context.Context, user *model.Me, form url.Values) (err error) {
+func (self ProjectLogic) Publish(ctx echo.Context, user *model.Me, form url.Values) (err error) {
 	objLog := GetLogger(ctx)
 
 	id := form.Get("id")
@@ -102,7 +103,7 @@ func (self ProjectLogic) Publish(ctx context.Context, user *model.Me, form url.V
 }
 
 // UriExists 通过 uri 是否存在 project
-func (ProjectLogic) UriExists(ctx context.Context, uri string) bool {
+func (ProjectLogic) UriExists(ctx echo.Context, uri string) bool {
 	total, err := MasterDB.Where("uri=?", uri).Count(new(model.OpenProject))
 	if err != nil || total == 0 {
 		return false
@@ -121,7 +122,7 @@ func (ProjectLogic) Total() int64 {
 }
 
 // FindBy 获取开源项目列表（分页）
-func (ProjectLogic) FindBy(ctx context.Context, limit int, lastIds ...int) []*model.OpenProject {
+func (ProjectLogic) FindBy(ctx echo.Context, limit int, lastIds ...int) []*model.OpenProject {
 	objLog := GetLogger(ctx)
 
 	dbSession := MasterDB.Where("status IN(?,?)", model.ProjectStatusNew, model.ProjectStatusOnline)
@@ -170,7 +171,7 @@ func (ProjectLogic) findByIds(ids []int) map[int]*model.OpenProject {
 }
 
 // FindOne 获取单个项目
-func (ProjectLogic) FindOne(ctx context.Context, val interface{}) *model.OpenProject {
+func (ProjectLogic) FindOne(ctx echo.Context, val interface{}) *model.OpenProject {
 	objLog := GetLogger(ctx)
 
 	field := "id"
@@ -193,7 +194,7 @@ func (ProjectLogic) FindOne(ctx context.Context, val interface{}) *model.OpenPro
 }
 
 // FindRecent 获得某个用户最近发布的开源项目
-func (ProjectLogic) FindRecent(ctx context.Context, username string) []*model.OpenProject {
+func (ProjectLogic) FindRecent(ctx echo.Context, username string) []*model.OpenProject {
 	projectList := make([]*model.OpenProject, 0)
 	err := MasterDB.Where("username=?", username).Limit(5).OrderBy("id DESC").Find(&projectList)
 	if err != nil {
@@ -204,7 +205,7 @@ func (ProjectLogic) FindRecent(ctx context.Context, username string) []*model.Op
 }
 
 // getOwner 通过objid获得 project 的所有者
-func (ProjectLogic) getOwner(ctx context.Context, id int) int {
+func (ProjectLogic) getOwner(ctx echo.Context, id int) int {
 	project := &model.OpenProject{}
 	_, err := MasterDB.Id(id).Get(project)
 	if err != nil {

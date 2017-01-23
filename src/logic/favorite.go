@@ -13,14 +13,15 @@ import (
 
 	"model"
 
-	"golang.org/x/net/context"
+//	"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 )
 
 type FavoriteLogic struct{}
 
 var DefaultFavorite = FavoriteLogic{}
 
-func (FavoriteLogic) Save(ctx context.Context, uid, objid, objtype int) error {
+func (FavoriteLogic) Save(ctx echo.Context, uid, objid, objtype int) error {
 	objLog := GetLogger(ctx)
 
 	favorite := &model.Favorite{}
@@ -42,13 +43,13 @@ func (FavoriteLogic) Save(ctx context.Context, uid, objid, objtype int) error {
 	return nil
 }
 
-func (FavoriteLogic) Cancel(ctx context.Context, uid, objid, objtype int) error {
+func (FavoriteLogic) Cancel(ctx echo.Context, uid, objid, objtype int) error {
 	_, err := MasterDB.Where("uid=? AND objtype=? AND objid=?", uid, objtype, objid).Delete(new(model.Favorite))
 	return err
 }
 
 // HadFavorite 某个用户是否已经收藏某个对象
-func (FavoriteLogic) HadFavorite(ctx context.Context, uid, objid, objtype int) int {
+func (FavoriteLogic) HadFavorite(ctx echo.Context, uid, objid, objtype int) int {
 	objLog := GetLogger(ctx)
 
 	favorite := &model.Favorite{}
@@ -65,7 +66,7 @@ func (FavoriteLogic) HadFavorite(ctx context.Context, uid, objid, objtype int) i
 	return 0
 }
 
-func (FavoriteLogic) FindUserFavorites(ctx context.Context, uid, objtype, start, rows int) ([]*model.Favorite, int64) {
+func (FavoriteLogic) FindUserFavorites(ctx echo.Context, uid, objtype, start, rows int) ([]*model.Favorite, int64) {
 	objLog := GetLogger(ctx)
 
 	favorites := make([]*model.Favorite, 0)

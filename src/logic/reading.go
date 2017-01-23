@@ -14,7 +14,8 @@ import (
 	"strings"
 
 	"github.com/polaris1119/logger"
-	"golang.org/x/net/context"
+	"github.com/labstack/echo"
+	//"golang.org/x/net/echo"
 )
 
 type ReadingLogic struct{}
@@ -29,7 +30,7 @@ func (ReadingLogic) FindLastList(beginTime string) ([]*model.MorningReading, err
 }
 
 // 获取晨读列表（分页）
-func (ReadingLogic) FindBy(ctx context.Context, limit, rtype int, lastIds ...int) []*model.MorningReading {
+func (ReadingLogic) FindBy(ctx echo.Context, limit, rtype int, lastIds ...int) []*model.MorningReading {
 	objLog := GetLogger(ctx)
 
 	dbSession := MasterDB.Where("rtype=?", rtype)
@@ -48,7 +49,7 @@ func (ReadingLogic) FindBy(ctx context.Context, limit, rtype int, lastIds ...int
 }
 
 // 【我要晨读】
-func (ReadingLogic) IReading(ctx context.Context, id int) string {
+func (ReadingLogic) IReading(ctx echo.Context, id int) string {
 	objLog := GetLogger(ctx)
 
 	reading := &model.MorningReading{}
@@ -72,7 +73,7 @@ func (ReadingLogic) IReading(ctx context.Context, id int) string {
 }
 
 // FindReadingByPage 获取晨读列表（分页）
-func (ReadingLogic) FindReadingByPage(ctx context.Context, conds map[string]string, curPage, limit int) ([]*model.MorningReading, int) {
+func (ReadingLogic) FindReadingByPage(ctx echo.Context, conds map[string]string, curPage, limit int) ([]*model.MorningReading, int) {
 	objLog := GetLogger(ctx)
 
 	session := MasterDB.NewSession()
@@ -102,7 +103,7 @@ func (ReadingLogic) FindReadingByPage(ctx context.Context, conds map[string]stri
 }
 
 // SaveReading 保存晨读
-func (ReadingLogic) SaveReading(ctx context.Context, form url.Values, username string) (errMsg string, err error) {
+func (ReadingLogic) SaveReading(ctx echo.Context, form url.Values, username string) (errMsg string, err error) {
 	reading := &model.MorningReading{}
 	err = schemaDecoder.Decode(reading, form)
 	if err != nil {
@@ -135,7 +136,7 @@ func (ReadingLogic) SaveReading(ctx context.Context, form url.Values, username s
 }
 
 // FindById 获取单条晨读
-func (ReadingLogic) FindById(ctx context.Context, id int) *model.MorningReading {
+func (ReadingLogic) FindById(ctx echo.Context, id int) *model.MorningReading {
 	reading := &model.MorningReading{}
 	_, err := MasterDB.Id(id).Get(reading)
 	if err != nil {

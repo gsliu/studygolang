@@ -12,7 +12,8 @@ import (
 
 	. "db"
 
-	"golang.org/x/net/context"
+//	"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 
 	"model"
 )
@@ -22,7 +23,7 @@ type LikeLogic struct{}
 var DefaultLike = LikeLogic{}
 
 // HadLike 某个用户是否已经喜欢某个对象
-func (LikeLogic) HadLike(ctx context.Context, uid, objid, objtype int) int {
+func (LikeLogic) HadLike(ctx echo.Context, uid, objid, objtype int) int {
 	objLog := GetLogger(ctx)
 
 	like := &model.Like{}
@@ -37,7 +38,7 @@ func (LikeLogic) HadLike(ctx context.Context, uid, objid, objtype int) int {
 
 // FindUserLikeObjects 获取用户对一批对象是否喜欢的状态
 // objids 两个值
-func (LikeLogic) FindUserLikeObjects(ctx context.Context, uid, objtype int, objids ...int) (map[int]int, error) {
+func (LikeLogic) FindUserLikeObjects(ctx echo.Context, uid, objtype int, objids ...int) (map[int]int, error) {
 	objLog := GetLogger(ctx)
 
 	if len(objids) < 2 {
@@ -68,7 +69,7 @@ func (LikeLogic) FindUserLikeObjects(ctx context.Context, uid, objtype int, obji
 // LikeObject 喜欢或取消喜欢
 // objid 注册的喜欢对象
 // uid 喜欢的人
-func (LikeLogic) LikeObject(ctx context.Context, uid, objid, objtype, likeFlag int) error {
+func (LikeLogic) LikeObject(ctx echo.Context, uid, objid, objtype, likeFlag int) error {
 	objLog := GetLogger(ctx)
 
 	// 点喜欢，活跃度+3

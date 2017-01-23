@@ -9,7 +9,8 @@ package logic
 import (
 	"model"
 
-	"golang.org/x/net/context"
+//		"golang.org/x/net/context"
+	"github.com/labstack/echo"
 
 	. "db"
 
@@ -21,7 +22,7 @@ type DynamicLogic struct{}
 var DefaultDynamic = DynamicLogic{}
 
 // FindBy 获取动态列表（分页）
-func (DynamicLogic) FindBy(ctx context.Context, lastId int, limit int) []*model.Dynamic {
+func (DynamicLogic) FindBy(ctx echo.Context, lastId int, limit int) []*model.Dynamic {
 	dynamicList := make([]*model.Dynamic, 0)
 	err := MasterDB.Where("id>?", lastId).OrderBy("seq DESC").Limit(limit).Find(&dynamicList)
 	if err != nil {

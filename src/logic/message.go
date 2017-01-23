@@ -19,7 +19,8 @@ import (
 	"github.com/polaris1119/goutils"
 	"github.com/polaris1119/logger"
 	"github.com/polaris1119/set"
-	"golang.org/x/net/context"
+//	"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 )
 
 type MessageLogic struct{}
@@ -27,7 +28,7 @@ type MessageLogic struct{}
 var DefaultMessage = MessageLogic{}
 
 // SendMessageTo from给to发短信息
-func (MessageLogic) SendMessageTo(ctx context.Context, from, to int, content string) bool {
+func (MessageLogic) SendMessageTo(ctx echo.Context, from, to int, content string) bool {
 	objLog := GetLogger(ctx)
 
 	message := &model.Message{
@@ -50,7 +51,7 @@ func (MessageLogic) SendMessageTo(ctx context.Context, from, to int, content str
 }
 
 // SendSystemMsgTo 给某人发系统消息
-func (MessageLogic) SendSystemMsgTo(ctx context.Context, to, msgtype int, ext map[string]interface{}) bool {
+func (MessageLogic) SendSystemMsgTo(ctx echo.Context, to, msgtype int, ext map[string]interface{}) bool {
 	if to == 0 {
 		return true
 	}
@@ -80,7 +81,7 @@ func (MessageLogic) SendSystemMsgTo(ctx context.Context, to, msgtype int, ext ma
 
 // SendSysMsgAtUids 给被@的用户发系统消息
 // authors 是被评论对象的作者
-func (MessageLogic) SendSysMsgAtUids(ctx context.Context, uids string, ext map[string]interface{}, author int) bool {
+func (MessageLogic) SendSysMsgAtUids(ctx echo.Context, uids string, ext map[string]interface{}, author int) bool {
 	if uids == "" {
 		return true
 	}
@@ -121,7 +122,7 @@ func (MessageLogic) SendSysMsgAtUids(ctx context.Context, uids string, ext map[s
 
 // SendSysMsgAtUsernames 给被@的用户发系统消息
 // ext 中可以指定 msgtype，没有指定，默认为 MsgtypeAtMe
-func (MessageLogic) SendSysMsgAtUsernames(ctx context.Context, usernames string, ext map[string]interface{}, author int) bool {
+func (MessageLogic) SendSysMsgAtUsernames(ctx echo.Context, usernames string, ext map[string]interface{}, author int) bool {
 	if usernames == "" {
 		return true
 	}
@@ -176,7 +177,7 @@ func (MessageLogic) SendSysMsgAtUsernames(ctx context.Context, usernames string,
 //		{"uid":xxx,"objid":xxx}
 //   model.MsgtypeAtMe 为：{"uid":xxx,"cid":xxx,"objid":xxx,"objtype":xxx}
 //   model.MsgtypePulishAtMe 为：{"uid":xxx,"objid":xxx,"objtype":xxx}
-func (self MessageLogic) FindSysMsgsByUid(ctx context.Context, uid int, paginator *Paginator) []map[string]interface{} {
+func (self MessageLogic) FindSysMsgsByUid(ctx echo.Context, uid int, paginator *Paginator) []map[string]interface{} {
 	objLog := GetLogger(ctx)
 
 	messages := make([]*model.SystemMessage, 0)
@@ -375,13 +376,13 @@ func (self MessageLogic) FindSysMsgsByUid(ctx context.Context, uid int, paginato
 	return result
 }
 
-func (MessageLogic) SysMsgCount(ctx context.Context, uid int) int64 {
+func (MessageLogic) SysMsgCount(ctx echo.Context, uid int) int64 {
 	total, _ := MasterDB.Where("`to`=?", uid).Count(new(model.SystemMessage))
 	return total
 }
 
 // 获得发给某人的短消息（收件箱）
-func (self MessageLogic) FindToMsgsByUid(ctx context.Context, uid int, paginator *Paginator) []map[string]interface{} {
+func (self MessageLogic) FindToMsgsByUid(ctx echo.Context, uid int, paginator *Paginator) []map[string]interface{} {
 	objLog := GetLogger(ctx)
 
 	messages := make([]*model.Message, 0)
@@ -417,13 +418,13 @@ func (self MessageLogic) FindToMsgsByUid(ctx context.Context, uid int, paginator
 	return result
 }
 
-func (MessageLogic) ToMsgCount(ctx context.Context, uid int) int64 {
+func (MessageLogic) ToMsgCount(ctx echo.Context, uid int) int64 {
 	total, _ := MasterDB.Where("`to`=? AND tdel=?", uid, model.TdelNotDel).Count(new(model.Message))
 	return total
 }
 
 // 获取某人发送的消息
-func (MessageLogic) FindFromMsgsByUid(ctx context.Context, uid int, paginator *Paginator) []map[string]interface{} {
+func (MessageLogic) FindFromMsgsByUid(ctx echo.Context, uid int, paginator *Paginator) []map[string]interface{} {
 	objLog := GetLogger(ctx)
 
 	messages := make([]*model.Message, 0)
@@ -446,13 +447,13 @@ func (MessageLogic) FindFromMsgsByUid(ctx context.Context, uid int, paginator *P
 	return result
 }
 
-func (MessageLogic) FromMsgCount(ctx context.Context, uid int) int64 {
+func (MessageLogic) FromMsgCount(ctx echo.Context, uid int) int64 {
 	total, _ := MasterDB.Where("`from`=? AND fdel=?", uid, model.FdelNotDel).Count(new(model.Message))
 	return total
 }
 
 // MarkHasRead 标记消息已读
-func (MessageLogic) MarkHasRead(ctx context.Context, ids []int, isSysMsg bool, uid int) bool {
+func (MessageLogic) MarkHasRead(ctx echo.Context, ids []int, isSysMsg bool, uid int) bool {
 	if len(ids) == 0 {
 		return true
 	}
@@ -483,7 +484,7 @@ func (MessageLogic) MarkHasRead(ctx context.Context, ids []int, isSysMsg bool, u
 
 // DeleteMessage 删除消息
 // msgtype -> system(系统消息)/inbox(outbox)(短消息)
-func (MessageLogic) DeleteMessage(ctx context.Context, id, msgtype string) bool {
+func (MessageLogic) DeleteMessage(ctx echo.Context, id, msgtype string) bool {
 	var err error
 	if msgtype == "system" {
 		_, err = MasterDB.Id(id).Delete(&model.SystemMessage{})
@@ -501,7 +502,7 @@ func (MessageLogic) DeleteMessage(ctx context.Context, id, msgtype string) bool 
 }
 
 // FindNotReadMsgNum 获得某个用户未读消息数（系统消息和短消息）
-func (MessageLogic) FindNotReadMsgNum(ctx context.Context, uid int) int {
+func (MessageLogic) FindNotReadMsgNum(ctx echo.Context, uid int) int {
 	sysMsgNum, err := MasterDB.Where("`to`=? AND hasread=?", uid, model.NotRead).Count(new(model.SystemMessage))
 	if err != nil {
 		logger.Errorln("SystemMessage logic FindNotReadMsgNum Error:", err)

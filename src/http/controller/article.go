@@ -29,8 +29,8 @@ type ArticleController struct{}
 
 // 注册路由
 func (this *ArticleController) RegisterRoute(g *echo.Group) {
-	g.Get("/articles", this.ReadList)
-	g.Get("/articles/:id", this.Detail)
+	g.GET("/articles", this.ReadList)
+	g.GET("/articles/:id", this.Detail)
 }
 
 // ReadList 网友文章列表页

@@ -40,7 +40,7 @@ func (self MessageController) RegisterRoute(g *echo.Group) {
 func (MessageController) Send(ctx echo.Context) error {
 	content := ctx.FormValue("content")
 	// 请求发送消息页面
-	if content == "" || ctx.Request().Method() != "POST" {
+	if content == "" || ctx.Request().Method != "POST" {
 		username := ctx.FormValue("username")
 		if username == "" {
 			return ctx.Redirect(http.StatusSeeOther, "/")

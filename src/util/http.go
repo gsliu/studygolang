@@ -35,7 +35,7 @@ func FetchRealUrl(uri string) (realUrl string) {
 const XRequestedWith = "X-Requested-With"
 
 func IsAjax(ctx echo.Context) bool {
-	if ctx.Request().Header().Get(XRequestedWith) == "XMLHttpRequest" {
+	if ctx.Request().Header.Get(XRequestedWith) == "XMLHttpRequest" {
 		return true
 	}
 	return false

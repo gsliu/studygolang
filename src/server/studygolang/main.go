@@ -63,11 +63,11 @@ func main() {
 	adminG := e.Group("/admin", pwm.NeedLogin(), pwm.AdminAuth())
 	admin.RegisterRoutes(adminG)
 
-	std := echo.New(getAddr())
+	//e := echo.New()
 	//std := standard.New(getAddr())
-	std.SetHandler(e)
+	///e.SetHandler(e)
 
-	gracefulRun(std)
+	gracefulRun(e)
 }
 
 func getAddr() string {

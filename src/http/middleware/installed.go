@@ -23,7 +23,7 @@ func Installed(filterPrefixs []string) echo.MiddlewareFunc {
 			if db.MasterDB == nil {
 				shouldRedirect := true
 
-				uri := ctx.Request().URI()
+				uri := ctx.Request().RequestURI
 				for _, prefix := range filterPrefixs {
 					if strings.HasPrefix(uri, prefix) {
 						shouldRedirect = false

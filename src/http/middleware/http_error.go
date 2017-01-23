@@ -21,7 +21,7 @@ func HTTPError() echo.MiddlewareFunc {
 		return func(ctx echo.Context) error {
 			if err := next(ctx); err != nil {
 
-				if !ctx.Response().Committed() {
+				if !ctx.Response().Committed {
 					if he, ok := err.(*echo.HTTPError); ok {
 						switch he.Code {
 						case http.StatusNotFound:

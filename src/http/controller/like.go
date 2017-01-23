@@ -27,7 +27,7 @@ func (self LikeController) RegisterRoute(g *echo.Group) {
 
 // Like 喜欢（或取消喜欢）
 func (LikeController) Like(ctx echo.Context) error {
-	form := ctx.FormParams()
+	form, _ := ctx.FormParams()
 	if !util.CheckInt(form, "objtype") || !util.CheckInt(form, "flag") {
 		return fail(ctx, 1, "参数错误")
 	}

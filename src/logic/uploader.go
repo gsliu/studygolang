@@ -24,7 +24,8 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 
 	. "db"
 
@@ -157,7 +158,7 @@ func (this *UploaderLogic) uploadMemoryFile(r gio.Reader, key string) (err error
 	return
 }
 
-func (this *UploaderLogic) UploadImage(ctx context.Context, reader gio.Reader, imgDir string, buf []byte, ext string) (string, error) {
+func (this *UploaderLogic) UploadImage(ctx echo.Context, reader gio.Reader, imgDir string, buf []byte, ext string) (string, error) {
 	objLogger := GetLogger(ctx)
 
 	md5 := goutils.Md5Buf(buf)
@@ -182,7 +183,7 @@ func (this *UploaderLogic) UploadImage(ctx context.Context, reader gio.Reader, i
 }
 
 // TransferUrl 将外站图片URL转为本站，如果失败，返回原图
-func (this *UploaderLogic) TransferUrl(ctx context.Context, origUrl string, prefixs ...string) (string, error) {
+func (this *UploaderLogic) TransferUrl(ctx echo.Context, origUrl string, prefixs ...string) (string, error) {
 	if origUrl == "" || strings.Contains(origUrl, "studygolang") {
 		return origUrl, errors.New("origin image is empty or is studygolang.com")
 	}

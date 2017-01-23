@@ -11,7 +11,8 @@ import (
 	"model"
 	"net/url"
 
-	"golang.org/x/net/context"
+	//"golang.org/x/net/echo"
+	"github.com/labstack/echo"
 )
 
 type RuleLogic struct{}
@@ -19,7 +20,7 @@ type RuleLogic struct{}
 var DefaultRule = RuleLogic{}
 
 // 获取抓取规则列表（分页）
-func (RuleLogic) FindBy(ctx context.Context, conds map[string]string, curPage, limit int) ([]*model.CrawlRule, int) {
+func (RuleLogic) FindBy(ctx echo.Context, conds map[string]string, curPage, limit int) ([]*model.CrawlRule, int) {
 	objLog := GetLogger(ctx)
 
 	session := MasterDB.NewSession()
@@ -48,7 +49,7 @@ func (RuleLogic) FindBy(ctx context.Context, conds map[string]string, curPage, l
 	return ruleList, int(total)
 }
 
-func (RuleLogic) FindById(ctx context.Context, id string) *model.CrawlRule {
+func (RuleLogic) FindById(ctx echo.Context, id string) *model.CrawlRule {
 	objLog := GetLogger(ctx)
 
 	rule := &model.CrawlRule{}
@@ -65,7 +66,7 @@ func (RuleLogic) FindById(ctx context.Context, id string) *model.CrawlRule {
 	return rule
 }
 
-func (RuleLogic) Save(ctx context.Context, form url.Values, opUser string) (errMsg string, err error) {
+func (RuleLogic) Save(ctx echo.Context, form url.Values, opUser string) (errMsg string, err error) {
 	objLog := GetLogger(ctx)
 
 	rule := &model.CrawlRule{}
@@ -93,7 +94,7 @@ func (RuleLogic) Save(ctx context.Context, form url.Values, opUser string) (errM
 	return
 }
 
-func (RuleLogic) Delete(ctx context.Context, id string) error {
+func (RuleLogic) Delete(ctx echo.Context, id string) error {
 	_, err := MasterDB.Id(id).Delete(new(model.CrawlRule))
 	return err
 }
